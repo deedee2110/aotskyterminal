@@ -126,7 +126,8 @@ async function getFlight(icao){
                         name: pilot.flight_plan.aircraft,
                         airlineName: airlineData ? airlineData.name : null,
                         airlineLogo: airlineData?.logo ?? 'https://images.kiwi.com/airlines/64x64/airlines.png',
-                        aircraftIcon: aircraftIcon
+                        aircraftIcon: aircraftIcon,
+                        aircraftTypeCode
                     },
                     location: {
                         altitude: pilot.altitude,
