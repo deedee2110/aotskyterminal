@@ -1,3 +1,4 @@
+
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400&display=swap">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css">
 <link rel="stylesheet" href="/styles/heathrow.css">
@@ -11,15 +12,11 @@
     <i class="fas fa-map" id="airportMapIcon" style="cursor: pointer; margin-left: 10px;"></i>
 </div>
 <div class="top-container">
-
   <div class="search-container">
     <form id="airport-search-form">
-
       <input type="text" id="airportInput" placeholder="Search for an airport...">
       <button type="submit">Search</button>
-
     </form>
-
   </div>
 </div>
 <div id="countdownContainer">
@@ -30,8 +27,6 @@
   <select id="airportSelection" style="display: none;"></select>
   <button id="selectAirportButton" style="display: none;">Go to Airport</button>
 </div>
-
-
 
 <!-- Departure Board -->
 <div id="flightModal" class="modal">
@@ -44,7 +39,6 @@
     <iframe id="flightFrame" src="" onload="iframeLoaded()" style="visibility: hidden;"></iframe>
   </div>
 </div>
-
 
 <div class="boards-container">
   <div class="board departures">
@@ -63,6 +57,7 @@
             <th>Airline</th>
             <th>Flight</th>
             <th>Status</th>
+            <th>Aircraft</th>
             <th></th>
           </tr>
         </thead>
@@ -90,6 +85,7 @@
             <th>Airline</th>
             <th>Flight</th>
             <th>Status</th>
+            <th>Aircraft</th>
             <th></th>
           </tr>
         </thead>
@@ -113,6 +109,14 @@
 <script src="js/script.js"></script>
 <script src="js/data.js"></script>
 <script>
+  function iframeLoaded() {
+    const loadingIndicator = document.getElementById('loadingIndicator');
+    const frame = document.getElementById('flightFrame');
+
+    loadingIndicator.style.display = 'none';
+    frame.style.visibility = 'visible';
+  }
+
   async function fetchAndUpdateData() {
     try {
       const path = window.location.pathname;
@@ -121,50 +125,37 @@
       const response = await fetch(`/api/flights/${icaoCode}`);
       const { departures, arrivals } = await response.json();
 
-      const departuresTbody = document.querySelector('.departures tbody');
-      departuresTbody.innerHTML = ''; // Clear existing rows
-      departures.forEach(flight => {
-        const { message, className } = getStatusMessage(flight.location.status, 'departure');
-        const row = `
-            <div class="table-row-container">
-                <table>
-                    <tr>
-                        <td><div>${new Date(flight.departure.departureTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}</div></td>
-                        <td><div>${flight.arrival.city} (<a href="/${flight.arrival.icao}">${flight.arrival.icao}</a>)</div></td>
-                        <td><div><img src="${flight.aircraft.airlineLogo}" alt="Airline Logo" class="airline-logo"></div></td>
-                        <td><div>${flight.callsign}</div></td>
-                        <td class="${className}"><div>${message}</div></td>
-                        <td><i class="fas fa-map" onclick="openModal('${flight.arrival.icao}', '${flight.callsign}')"></i></td>
-                    </tr>
-                </table>
-            </div>`;
-        departuresTbody.innerHTML += row;
-      });
-
-
-      const arrivalsTbody = document.querySelector('.arrivals tbody');
-      arrivalsTbody.innerHTML = '';
-      arrivals.forEach(flight => {
-        const { message, className } = getStatusMessage(flight.location.status, 'arrival');
-        const row = `
-            <div class="table-row-container">
-                <table>
-                    <tr>
-                        <td><div>${new Date(flight.arrival.arrivalTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}</div></td>
-                        <td><div>${flight.departure.city} (<a href="/${flight.departure.icao}">${flight.departure.icao}</a>)</div></td>
-                        <td><div><img src="${flight.aircraft.airlineLogo}" alt="Airline Logo" class="airline-logo"></div></td>
-                        <td><div>${flight.callsign}</div></td>
-                        <td class="${className}"><div>${message}</div></td>
-                        <td><i class="fas fa-map" onclick="openModal('${flight.arrival.icao}', '${flight.callsign}')"></i></td>
-                    </tr>
-                </table>
-            </div>`;
-        arrivalsTbody.innerHTML += row;
-      });
+      updateFlightTable('.departures', departures, 'departure');
+      updateFlightTable('.arrivals', arrivals, 'arrival');
     } catch (error) {
       console.error('Error fetching or updating flight data:', error);
     }
   }
+
+  function updateFlightTable(selector, flights, type) {
+    const tbody = document.querySelector(`${selector} tbody`);
+    tbody.innerHTML = '';
+
+    flights.forEach(flight => {
+      const { message, className } = getStatusMessage(flight.location.status, type);
+      const row = `
+        <div class="table-row-container">
+          <table>
+            <tr>
+              <td><div>${new Date(flight[type][`${type}Time`]).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}</div></td>
+              <td><div>${flight[type === 'departure' ? 'arrival' : 'departure'].city} (<a href="/${flight[type === 'departure' ? 'arrival' : 'departure'].icao}">${flight[type === 'departure' ? 'arrival' : 'departure'].icao}</a>)</div></td>
+              <td><div><img src="${flight.aircraft.airlineLogo}" alt="Airline Logo" class="airline-logo"></div></td>
+              <td><div>${flight.callsign}</div></td>
+              <td class="${className}"><div>${message}</div></td>
+              <td><div><img src="${flight.aircraft.aircraftIcon}" width="50px" title="${flight.aircraft.aircraftTypeCode}"></img><br><p>${flight.aircraft.aircraftTypeCode}</p></div></td>
+              <td><i class="fas fa-map" onclick="openModal('${flight.arrival.icao}', '${flight.callsign}')"></i></td>
+            </tr>
+          </table>
+        </div>`;
+      tbody.innerHTML += row;
+    });
+  }
+
   function openModal(icao, callsign = '') {
     const modal = document.getElementById('flightModal');
     const frame = document.getElementById('flightFrame');
@@ -173,25 +164,19 @@
     const url = `/${encodeURIComponent(icao)}/map/${encodeURIComponent(callsign)}`;
     frame.src = url;
     
-    loadingIndicator.style.display = 'block'; // Show loading indicator
+    loadingIndicator.style.display = 'block';
     modal.style.display = 'block';
   }
 
-  function iframeLoaded() {
-    const loadingIndicator = document.getElementById('loadingIndicator');
-    const frame = document.getElementById('flightFrame');
-
-    loadingIndicator.style.display = 'none'; // Hide loading indicator
-    frame.style.visibility = 'visible'; // Make iframe visible}
-  }
   function closeModal() {
     const modal = document.getElementById('flightModal');
     const frame = document.getElementById('flightFrame');
-    frame.src = ''; // This ensures the connection is terminated
+    frame.src = '';
     modal.style.display = 'none';
   }
+
   document.getElementById('airportMapIcon').addEventListener('click', function () {
-    const icaoCode = "<%= departures[0]?.departure?.icao || arrivals[0]?.arrival?.icao || '' %>"; // Extract ICAO from the server-side data
+    const icaoCode = "<%= departures[0]?.departure?.icao || arrivals[0]?.arrival?.icao || '' %>";
     openModal(icaoCode);
   });
 </script>

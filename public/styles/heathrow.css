@@ -371,3 +371,6 @@ iframe {
 .github-link .fab {
   margin-right: 5px;
 }
+td div p {
+	margin-left: 5px;
+  }
