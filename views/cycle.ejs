@@ -7,35 +7,44 @@
     <style>
         .container {
             display: flex;
-            justify-content: space-between;
+            justify-content: space-around;
+            padding: 10px;
         }
+
         .page {
-            width: 48%;
+            width: 45%;
         }
+
         body {
+            font-family: Arial, sans-serif;
             background-color: #151B20;
             color: #ffffff;
+        }
+
+        .image-ic {
+            height: 75px;
+            margin-right: 10px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div id="departures" class="page">
-            <h1>Departures</h1>
-            <ul>
-                <% departures.forEach(function(flight) { %>
-                    <li><%= flight.callsign %> - <%= flight.departure.airportName %> to <%= flight.arrival.airportName %></li>
-                <% }); %>
-            </ul>
-        </div>
-        <div id="arrivals" class="page">
-            <h1>Arrivals</h1>
-            <ul>
-                <% arrivals.forEach(function(flight) { %>
-                    <li><%= flight.callsign %> - <%= flight.departure.airportName %> to <%= flight.arrival.airportName %></li>
-                <% }); %>
-            </ul>
-        </div>
+<div class="container">
+    <div id="departures" class="page">
+        <img src="/deps.png" alt="arr" class="image-ic"/>
+        <ul>
+            <% departures.forEach(function(flight) { %>
+                <li><%= flight.callsign %> - <%= flight.departure.city %> to <%= flight.arrival.city %></li>
+            <% }); %>
+        </ul>
     </div>
+    <div id="arrivals" class="page">
+        <img src="/arrs.png" alt="arr" class="image-ic"/>
+        <ul>
+            <% arrivals.forEach(function(flight) { %>
+                <li><%= flight.callsign %> - <%= flight.departure.city %> to <%= flight.arrival.city %></li>
+            <% }); %>
+        </ul>
+    </div>
+</div>
 </body>
 </html>
