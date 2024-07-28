@@ -289,7 +289,17 @@ app.get('/:icao/map/:callsign', async (req, res) => {
 app.get('/', (req, res) => {
     res.render('index');
 });
+app.get('/cycle/:icao', async (req, res) => {
+    const icao = req.params.icao.toUpperCase();
 
+    try {
+        const { departures, arrivals } = await getFlight(icao);
+        res.render('cycle', { departures, arrivals });
+    } catch (error) {
+        console.error("Error fetching flight data for ICAO:", error);
+        res.status(500).send('Error fetching flight data');
+    }
+});
 
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cycle Departures and Arrivals</title>
+    <style>
+        .container {
+            display: flex;
+            justify-content: space-between;
+        }
+        .page {
+            width: 48%;
+        }
+        body {
+            background-color: #151B20;
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="departures" class="page">
+            <h1>Departures</h1>
+            <ul>
+                <% departures.forEach(function(flight) { %>
+                    <li><%= flight.callsign %> - <%= flight.departure.airportName %> to <%= flight.arrival.airportName %></li>
+                <% }); %>
+            </ul>
+        </div>
+        <div id="arrivals" class="page">
+            <h1>Arrivals</h1>
+            <ul>
+                <% arrivals.forEach(function(flight) { %>
+                    <li><%= flight.callsign %> - <%= flight.departure.airportName %> to <%= flight.arrival.airportName %></li>
+                <% }); %>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
